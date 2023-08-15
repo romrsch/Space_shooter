@@ -29,6 +29,13 @@ public class PlayerShip : MonoBehaviour
 	
 	private void Awake()
 	{
+		/*
+		if (Controller.Instance == null)
+		{
+            global::System.Object value = SceneManager.LoadScene(0);
+			return;
+		}
+		*/
 		_rigidbody = GetComponent<Rigidbody2D>();
 		_mR = GetComponent<MeshRenderer>();
 		_controller = Controller.Instance;
