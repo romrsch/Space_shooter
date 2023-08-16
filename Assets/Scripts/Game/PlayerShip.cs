@@ -79,6 +79,9 @@ public class PlayerShip : MonoBehaviour
 		
 		_rigidbody.velocity = Vector2.Lerp(_rigidbody.velocity, new Vector2(moveHor * _speed * 1.2f, moveVert * _speed), _smothness );
 		 transform.position = CheckBoardWorld();
+
+		var targetRotation = Quaternion.Euler(0,180 + (-moveHor * _shipRollEuler),0);
+		transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _shipRollSpeed * Time.deltaTime);
 	}
 	
 	private Vector3 CheckBoardWorld()
