@@ -96,5 +96,29 @@ public class PlayerShip : MonoBehaviour
 
         return new Vector3(x, y, 0);
     }
-	
+
+	public void DamageMe(int damage)
+	{
+		_health.Value -= damage;
+		if (_health.Value <= 0)
+		{
+			var tr = transform;
+			var position = tr.position;
+			gameObject.SetActive(false);
+			_controller.GameOver();
+
+        }
+	}
+
+	private void OnTriggerEnter2D(Collider2D collision)
+	{ 
+		var obj = collision.gameObject;
+		if (obj.CompareTag("EnemyBullet"))
+		{
+			var bull = obj.GetComponent<Bullet>();
+			DamageMe(bull._damage);
+			bull.HitMe();
+		}
+	}
+
 }

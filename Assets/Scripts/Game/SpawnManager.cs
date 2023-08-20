@@ -15,6 +15,7 @@ public class SpawnManager : MonoBehaviour
     [SerializeField] private Transform _poolBulletMy;
     [SerializeField] private List<GameObject> _enemyPrefabs = new List<GameObject>();// enemy Ships
     [SerializeField] private Transform _poolEnemyRoot;
+    [SerializeField] private Transform _poolEnemyBullet;
 
     public GameObject BulletPref { get => BulletPref1; set => BulletPref1 = value; }
     public GameObject BulletPref1 { get => _bulletPref; set => _bulletPref = value; }
@@ -36,26 +37,45 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
-    private void SpawnBullet()
+    public void SpawnBullet(Transform enemyTransform = null, Bullet enemyBullet = null) // выстрелы не только для корабля героя, но и для врагов
     {
         GameObject bullet;
-
-        if (_poolBulletMy.childCount > 0)
+        if (enemyTransform != null && enemyBullet != null)
         {
-            bullet = _poolBulletMy.GetChild(0).gameObject;
+            if (_poolEnemyBullet.childCount > 0)
+            {
+                bullet = _poolEnemyBullet.GetChild(0).gameObject;
+            }
+            else
+            {
+                bullet = Instantiate(enemyBullet).gameObject;
+                var bulletScript = bullet.GetComponent<Bullet>();
+                bulletScript.PutMe.Subscribe(PutObject).AddTo(_disposables);
+            }
+            bullet.transform.parent = _poolBulletMy;
+            var position = enemyTransform.transform.position;
+            bullet.transform.position = new Vector3(position.x, position.y - 1.2f, 0);
         }
         else
         {
-            bullet = Instantiate(_bulletPref);
-            bullet.GetComponent<Bullet>().PutMe.Subscribe(PutObject);
+            if (_poolBulletMy.childCount > 0)
+            {
+                bullet = _poolBulletMy.GetChild(0).gameObject;
+            }
+            else
+            {
+                bullet = Instantiate(_bulletPref);
+                bullet.GetComponent<Bullet>().PutMe.Subscribe(PutObject).AddTo(_disposables);
+            }
+            bullet.transform.parent = transform;
+            var pos = _playerShip.transform.position;
+            bullet.transform.position = new Vector3(pos.x, pos.y + 1.2f, 0);
         }
-        bullet.transform.parent = transform;
-        var pos = _playerShip.transform.position;
-        bullet.transform.position = new Vector3(pos.x, pos.y + 1.2f, 0);
+
         bullet.gameObject.SetActive(true);
     }
 
-    public BaseEnemyShip SpawnEnemy()
+    public Hunter SpawnEnemy()
     {
         var controller = Controller.Instance;
         GameObject ship;
@@ -82,25 +102,45 @@ public class SpawnManager : MonoBehaviour
         ship.transform.position = spawnPos;
         ship.SetActive(true);
 
-        return ship.GetComponent<BaseEnemyShip>();
-
-
+        return ship.GetComponent<Hunter>();
     }
-      
+   
 
     private void PutObject(MonoBehaviour mono)
     {
         var objBull = mono as Bullet;
         if (objBull != null)
         {
+            if (objBull._isEnemy)
+            {
+                objBull.transform.parent = _poolEnemyBullet;
+            }
+            else
+            {
+                objBull.transform.parent = _poolBulletMy;
+            }
             objBull.transform.parent = _poolBulletMy;
+            objBull.gameObject.SetActive(false);
+            return;
         }
-        objBull.gameObject.SetActive(false);
+
+        var objShip = mono as BaseEnemyShip;
+        if (objShip != null) 
+        {
+            objShip.transform.parent = objShip._myRoot;
+            objShip.gameObject.SetActive(false);
+        }
     }
+    private void OnEnable()
+    {
+        _disposables = new CompositeDisposable();
+    }
+
 
     private void OnDisable() 
     {
         _disposables.Dispose();
+        _disposables = null;
     }
 
 }

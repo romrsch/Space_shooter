@@ -24,16 +24,32 @@ public class Bullet : MonoBehaviour
         StartCoroutine(Move());
     }
 
-    private IEnumerator Move()
+    private IEnumerator Move() // куда двигается пуля
     {
-        while (transform.position.y < _goTo)
-        { 
-            transform.position += new Vector3(0, Time.deltaTime * _speed, 0);
-            yield return null;
+        if (_isEnemy) // если пуля вражеская, то двигаем её вниз
+        {
+            while (transform.position.y > -_goTo) // пуля долетает до нижнего края -goTo
+            {
+                transform.position += new Vector3(0, Time.deltaTime * _speed, 0);
+                yield return null;
+            }
+        }
+        else // иначе пуля - наша, двигаем её вверх
+        {
+            while (transform.position.y < _goTo)
+            {
+                transform.position += new Vector3(0, Time.deltaTime * _speed, 0);
+                yield return null;
+            }
         }
         _putMe.OnNext(this);
     }
-    
+
+    public void HitMe()
+    {
+        _putMe.OnNext(this);
+    }
+
     private void OnDisable()
     {
         StopAllCoroutines();
