@@ -1,13 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UniRx;
+using System;
 
 public class Controller : MonoBehaviour
 {
         [SerializeField] private AudioSource _musicSource;
         [SerializeField] private AudioSource _effectSource;
- 
- 
+
+    public HealthBonus _healthBonusPref;
+    public int _procentBonusHealth = 30;
+
+    public ReactiveProperty<int> Score = new ReactiveProperty<int>();
     public AudioSource MusicSource => _musicSource;
     public AudioSource EffectSource => _effectSource;
 
@@ -26,6 +31,9 @@ public class Controller : MonoBehaviour
     public Vector3 LeftUpPoint => _leftUpPoint;
     public Vector3 RightUpPoint => _rightUpPoint;
     public Vector2 CentrCam => _centrCam;
+
+    private Subject<Unit> _gameOver = new Subject<Unit>();
+    public IObservable<Unit> OnGameOver => _gameOver;
 
     private void Awake()
     { 
@@ -50,6 +58,6 @@ public class Controller : MonoBehaviour
     }
     public void GameOver()
     { 
-        
+        _gameOver.OnNext(Unit.Default); // рассылаем события, что игра закончена
     }
 }

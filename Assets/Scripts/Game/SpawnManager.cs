@@ -25,6 +25,7 @@ public class SpawnManager : MonoBehaviour
 
     private void Start()
     {
+        Controller.Instance.Score.Value = 0; // обнуляем количество очков
         _playerShip = Controller.Instance._myShip;
         _playerShip.FireClick.Subscribe((_) => SpawnBullet());
 
@@ -127,6 +128,7 @@ public class SpawnManager : MonoBehaviour
         var objShip = mono as BaseEnemyShip;
         if (objShip != null) 
         {
+           // Controller.Instance.Score.Value += objShip.CostPointerScore;
             objShip.transform.parent = objShip._myRoot;
             objShip.gameObject.SetActive(false);
         }

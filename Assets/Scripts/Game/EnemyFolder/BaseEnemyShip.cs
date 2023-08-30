@@ -22,6 +22,8 @@ public abstract class BaseEnemyShip : MonoBehaviour
     [SerializeField] private int _maxHealth = 2;
     [SerializeField] private int _costPointesScore = 5;
 
+    public int CostPointerScore => _costPointesScore;
+
     [HideInInspector] public PlayerShip _player;
     [HideInInspector] public Transform _myRoot;
     [HideInInspector] public Vector3 _playerLastPos = Vector3.up;
@@ -122,9 +124,22 @@ public abstract class BaseEnemyShip : MonoBehaviour
         if (obj.CompareTag("Player"))
         {
             obj.GetComponent<PlayerShip>().DamageMe(_collisionDamage);
+            Controller.Instance.Score.Value += (_costPointesScore/2);  // если вражеский корабль столкнулся с нами - получаем очки
             _putMe.OnNext(this);
         }
     }
+
+    private void SpawnBonus()
+    {
+        var random = UnityEngine.Random.Range(0, 100);
+        if (random < Controller.Instance._procentBonusHealth)  // создаем бонус
+        {
+            Instantiate(Controller.Instance._healthBonusPref, transform.position, new Quaternion(0, 0, 0, 0));
+        }
+    
+    }
+
+
 
     private void DamageMe(int damage, BaseEnemyShip baseEnemy)
     {
@@ -132,6 +147,8 @@ public abstract class BaseEnemyShip : MonoBehaviour
         if (_health <= 0)
         {
             _health = _maxHealth;
+            SpawnBonus();
+            Controller.Instance.Score.Value += _costPointesScore;  // если вражеский корабль уничтожен выстрелом - получаем полную награду
             _putMe.OnNext(this);
         }
         
