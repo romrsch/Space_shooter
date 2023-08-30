@@ -162,5 +162,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 14
+  _destroyEffect: {fileID: 100002, guid: 6890a03af913b874092fbb1e8337747d, type: 3}
   _damage: 1
   _isEnemy: 0

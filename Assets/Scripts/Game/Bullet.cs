@@ -9,6 +9,8 @@ public class Bullet : MonoBehaviour
 {
     
     [SerializeField] private float _speed = 14;
+    [SerializeField] private GameObject _destroyEffect;
+
     public int _damage = 3;
 
     private Subject<MonoBehaviour> _putMe = new Subject<MonoBehaviour>();
@@ -30,7 +32,7 @@ public class Bullet : MonoBehaviour
         {
             while (transform.position.y > -_goTo) // пуля долетает до нижнего края -goTo
             {
-                transform.position += new Vector3(0, Time.deltaTime * _speed, 0);
+                transform.position -= new Vector3(0, Time.deltaTime * _speed, 0);
                 yield return null;
             }
         }
@@ -48,6 +50,8 @@ public class Bullet : MonoBehaviour
     public void HitMe()
     {
         _putMe.OnNext(this);
+        var pos = transform.position; // получаем позицию пули
+        Instantiate(_destroyEffect, new(pos.x, pos.y, -2), transform.rotation);
     }
 
     private void OnDisable()

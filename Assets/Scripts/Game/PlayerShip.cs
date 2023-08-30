@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class PlayerShip : MonoBehaviour
 {
+	[SerializeField] private ParticleSystem[] _effects;
 	[SerializeField] private float _speed = 15;
 	[SerializeField] private float _coolDown = 0.1f;
 	public int _maxHealth = 100;
@@ -72,12 +73,31 @@ public class PlayerShip : MonoBehaviour
 	}
 
 
-	private void UpdateKey()
+	private void UpdateKey()  
 	{
 		float moveHor = Input.GetAxis("Horizontal");
 		float moveVert = Input.GetAxis("Vertical");
-		
-		_rigidbody.velocity = Vector2.Lerp(_rigidbody.velocity, new Vector2(moveHor * _speed * 1.2f, moveVert * _speed), _smothness );
+
+		// сюда же допишем регулировку эффектов: двигателей
+		if (moveVert > 0) _effects[4].Play();
+		else { _effects[4].Stop(); }
+		if (moveVert < 0)
+		{
+			_effects[2].Play();
+			_effects[3].Play();
+		}
+		else
+		{
+			_effects[2].Stop();
+			_effects[3].Stop();
+		}
+		if(moveHor > 0) _effects[0].Play();
+		else _effects[0].Stop();
+
+		if(moveHor < 0) _effects[1].Play();
+		else _effects[1].Stop();
+
+        _rigidbody.velocity = Vector2.Lerp(_rigidbody.velocity, new Vector2(moveHor * _speed * 1.2f, moveVert * _speed), _smothness );
 		 transform.position = CheckBoardWorld();
 
 		var targetRotation = Quaternion.Euler(0,180 + (-moveHor * _shipRollEuler),0);

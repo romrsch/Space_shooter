@@ -21,6 +21,8 @@ public abstract class BaseEnemyShip : MonoBehaviour
     [SerializeField] private int _collisionDamage = 10;
     [SerializeField] private int _maxHealth = 2;
     [SerializeField] private int _costPointesScore = 5;
+    [SerializeField] private ParticleSystem _fireEngine; // эффекты двигателя
+    [SerializeField] private GameObject _destroyEffect; // эффекты взрыва
 
     public int CostPointerScore => _costPointesScore;
 
@@ -40,6 +42,7 @@ public abstract class BaseEnemyShip : MonoBehaviour
     private IEnumerator Core()
     {
         UpdateStage(StageShip.In);
+        _fireEngine.Play();
         while (transform.position.y > _goToPointTurbo)
         {
             Look(new Vector3(0, _goToPointTurbo, 0));
@@ -48,6 +51,7 @@ public abstract class BaseEnemyShip : MonoBehaviour
         }
 
         UpdateStage(StageShip.Wait);
+        _fireEngine.Stop();
         while (_timerDelay < _delayTurbo) 
         {
             _timerDelay += Time.deltaTime;
@@ -55,6 +59,7 @@ public abstract class BaseEnemyShip : MonoBehaviour
         }
 
         UpdateStage(StageShip.Out);
+        _fireEngine.Play();
         if (_playerLastPos != Vector3.up)
         {
             var dir = DirectionToPlayer / DirectionToPlayer.magnitude;
@@ -121,10 +126,11 @@ public abstract class BaseEnemyShip : MonoBehaviour
             DamageMe(bull._damage, this);
             return;
         }
-        if (obj.CompareTag("Player"))
+        if (obj.CompareTag("Player")) 
         {
             obj.GetComponent<PlayerShip>().DamageMe(_collisionDamage);
             Controller.Instance.Score.Value += (_costPointesScore/2);  // если вражеский корабль столкнулся с нами - получаем очки
+            SpawnDestroyEffect();  // взрыв при столкновении с игроком
             _putMe.OnNext(this);
         }
     }
@@ -139,6 +145,11 @@ public abstract class BaseEnemyShip : MonoBehaviour
     
     }
 
+    private void SpawnDestroyEffect()  // эффект взрыва
+    { 
+        var pos = transform.position;
+        Instantiate(_destroyEffect, new Vector3(pos.x, pos.y, -2), transform.rotation);
+    }
 
 
     private void DamageMe(int damage, BaseEnemyShip baseEnemy)
@@ -148,6 +159,7 @@ public abstract class BaseEnemyShip : MonoBehaviour
         {
             _health = _maxHealth;
             SpawnBonus();
+            SpawnDestroyEffect();
             Controller.Instance.Score.Value += _costPointesScore;  // если вражеский корабль уничтожен выстрелом - получаем полную награду
             _putMe.OnNext(this);
         }
