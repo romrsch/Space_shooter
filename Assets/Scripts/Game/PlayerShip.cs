@@ -102,6 +102,12 @@ public class PlayerShip : MonoBehaviour
 
 		var targetRotation = Quaternion.Euler(0,180 + (-moveHor * _shipRollEuler),0);
 		transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _shipRollSpeed * Time.deltaTime);
+
+		// выход в главное меню по нажатию Esc
+		if (Input.GetKeyUp(KeyCode.Escape))
+		{
+			LevelManager.PlayScene(Scenes.MainMenu);
+		}
 	}
 	
 	private Vector3 CheckBoardWorld()

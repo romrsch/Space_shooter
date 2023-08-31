@@ -41,6 +41,7 @@ public class SpawnManager : MonoBehaviour
     public void SpawnBullet(Transform enemyTransform = null, Bullet enemyBullet = null) // выстрелы не только для корабля героя, но и для врагов
     {
         GameObject bullet;
+        Controller.Instance.PlayAudioShot();
         if (enemyTransform != null && enemyBullet != null)
         {
             if (_poolEnemyBullet.childCount > 0)

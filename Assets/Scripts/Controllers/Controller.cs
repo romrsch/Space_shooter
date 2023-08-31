@@ -6,8 +6,9 @@ using System;
 
 public class Controller : MonoBehaviour
 {
-        [SerializeField] private AudioSource _musicSource;
+        [SerializeField] private AudioSource _musicSource;  // Звуковые эффекты
         [SerializeField] private AudioSource _effectSource;
+        [SerializeField] private AudioClip _clipShot;
 
     public HealthBonus _healthBonusPref;
     public int _procentBonusHealth = 30;
@@ -38,6 +39,11 @@ public class Controller : MonoBehaviour
     private void Awake()
     { 
         Instance = this;
+    }
+
+    public void PlayAudioShot()  // звук выстрела
+    { 
+        _effectSource.PlayOneShot(_clipShot);
     }
 
     public void UpdateCameraSettings()
